@@ -37,7 +37,7 @@ public class RecordMain extends LinearOpMode {
     public void runOpMode(){
         initi();
         while(opModeIsActive()) {
-            mecDrive.joystickTeleop(gamepad1,0.5); //does the math and calculates how to move from the joystick values
+            mecDrive.teleopTank(gamepad1,0.5); //does the math and calculates how to move from the joystick values
             try {
                 recorder.record(); //records current global position and records into a csv file separated by a comma
             }
