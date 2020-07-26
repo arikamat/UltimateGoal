@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -15,13 +16,15 @@ public class MecanumDrive {
         this.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.fr = hardwareMap.get(DcMotor.class, frName);
-        this.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.fr.setDirection(DcMotorSimple.Direction.REVERSE);
 
         this.bl = hardwareMap.get(DcMotor.class, blName);
         this.bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.br = hardwareMap.get(DcMotor.class, brName);
         this.br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.br.setDirection(DcMotorSimple.Direction.REVERSE);
         if(usingEncoder){
             this.fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             this.fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -90,6 +93,43 @@ public class MecanumDrive {
         this.fr.setPower(RF);
         this.bl.setPower(LR);
         this.br.setPower(RR);
+    }
+    public void teleopTank(Gamepad g1){
+        //default value of 1 for speedModifier()
+        teleopTank(g1,1);
+    }
+    public void teleopTank(Gamepad g1,double speedModifier){
+        double right = g1.right_stick_y*speedModifier;
+        double left = g1.left_stick_y*speedModifier;
+        double strafeLeft =g1.left_trigger;
+        double strafeRight = g1.right_trigger;
+        if(Math.abs(left)>0.1 || Math.abs(right)>0.1){
+            //significant movement in joystick y direction
+            this.fl.setPower(left);
+            this.bl.setPower(left);
+            this.fr.setPower(right);
+            this.br.setPower(right);
+            //This is tank drive. Left joystick controls left wheels & Right joystick controls right wheels
+        }
+        else{
+            //No significant joystick movements
+            stop();
+        }
+        if(strafeRight>0.1){
+            //Strafe Right means means we want front left to go forwards and back right to go forwards while all others go backwards
+            this.fl.setPower(strafeRight);
+            this.bl.setPower(-strafeRight);
+            this.fr.setPower(-strafeRight);
+            this.br.setPower(strafeRight);
+        }
+        else if(strafeLeft>0.1){
+            //Strafe Right means means we want front left to go forwards and back right to go forwards while all others go backwards
+            this.fl.setPower(-strafeLeft);
+            this.bl.setPower(strafeLeft);
+            this.fr.setPower(strafeLeft);
+            this.br.setPower(-strafeLeft);
+        }
+
     }
     public void stop(){
         setPower(0.0,0.0,0.0,0.0);
