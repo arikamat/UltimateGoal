@@ -5,13 +5,25 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.utils.odometry.GlobalPosition;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class MecanumDrive {
     private String flName = CONFIG.FRONTLEFT;
     private String frName = CONFIG.FRONTRIGHT;
     private String blName = CONFIG.BACKLEFT;
     private String brName = CONFIG.BACKRIGHT;
+    GlobalPosition gps;
     private DcMotor fl, fr,bl,br;
     public MecanumDrive(HardwareMap hardwareMap, boolean usingEncoder){
+        gps = new GlobalPosition(hardwareMap,75);
+        GlobalPosition gps = new GlobalPosition(hardwareMap,75);
+        Thread pos = new Thread(gps);
+        pos.start();
+
         this.fl = hardwareMap.get(DcMotor.class, flName);
         this.fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -66,6 +78,7 @@ public class MecanumDrive {
         double[] wheelPowers = {flPower,frPower,blPower,brPower};
         return  wheelPowers;
     }
+
     public void joystickTeleop(Gamepad gamepad1, double speedEnhancer){
         double motorMax=1;
         double X1,X2,Y1,Y2;
@@ -133,5 +146,27 @@ public class MecanumDrive {
     }
     public void stop(){
         setPower(0.0,0.0,0.0,0.0);
+    }
+    public void XYCorrection(double x, double y, double turn){
+        double flPower = y + turn + x;
+        double blPower = y + turn - x;
+        double frPower = y - turn - x;
+        double brPower = y - turn + x;
+        List<Double> list = Arrays.asList(a(flPower), a(blPower), a(frPower), a(brPower));
+        Double max = Collections.max(list);
+        if (max > 1.0) {
+            flPower /= max;
+            blPower /= max;
+            frPower /= max;
+            brPower /= max;
+        }
+        this.fl.setPower(flPower);
+        this.bl.setPower(blPower);
+        this.fr.setPower(frPower);
+        this.br.setPower(brPower);
+
+    }
+    public double a(double b){
+        return Math.abs(b);
     }
 }

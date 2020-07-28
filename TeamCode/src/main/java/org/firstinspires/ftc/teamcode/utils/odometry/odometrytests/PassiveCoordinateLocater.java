@@ -8,49 +8,28 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.utils.CONFIG;
+import org.firstinspires.ftc.teamcode.utils.Encoders;
+import org.firstinspires.ftc.teamcode.utils.IMU;
+import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.odometry.GlobalPosition;
 
 @TeleOp(name = "Passive GPS Test", group = "Tests")
 public class PassiveCoordinateLocater extends LinearOpMode {
     private GlobalPosition gps;
-    final double COUNTSPERINCH =307.69957;
-    BNO055IMU imu;
-    DcMotor FL,FR,BL,BR, odoL, odoR, odoH;
-    public void initialize(){
-        FL = hardwareMap.get(DcMotor.class, CONFIG.FRONTLEFT);
-        FR = hardwareMap.get(DcMotor.class, CONFIG.FRONTRIGHT);
-        BL = hardwareMap.get(DcMotor.class, CONFIG.BACKLEFT);
-        BR = hardwareMap.get(DcMotor.class, CONFIG.BACKRIGHT);
-        odoL = hardwareMap.get(DcMotor.class, CONFIG.LEFTVERTICAL);
-        odoH =hardwareMap.get(DcMotor.class, CONFIG.HORIZONTAL);
-        odoR =hardwareMap.get(DcMotor.class, CONFIG.RIGHTVERTICAL);
-        FL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        FR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odoH.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odoL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odoR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //---
-        FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //---
-        odoL.setDirection(DcMotorSimple.Direction.REVERSE);
-        odoH.setDirection(DcMotorSimple.Direction.REVERSE);
-        odoR.setDirection(DcMotorSimple.Direction.REVERSE);
+    MecanumDrive drive;
+    IMU imu;
+    Encoders encoders;
+    static final double TICKS_PER_REV = CONFIG.COUNTS_PER_REVOLUTION;
+    static final double WHEEL_DIAMETER = 1.5;
+    static final double GEAR_RATIO= 1;
+    final double COUNTS_PER_INCH = WHEEL_DIAMETER*Math.PI*GEAR_RATIO/TICKS_PER_REV;
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu.initialize(parameters);
-        telemetry.addData("IMU Setup", "Initialization is Complete");
+    public void initialize(){
+        imu = new IMU(hardwareMap);
+        drive = new MecanumDrive(hardwareMap,false);
+        encoders = new Encoders(hardwareMap);
+        encoders.resetEncoders();
+        telemetry.addData("IMU Setup", imu.initializeIMU());
         telemetry.update();
 
     }
@@ -62,8 +41,9 @@ public class PassiveCoordinateLocater extends LinearOpMode {
         Thread pos = new Thread(gps);
         pos.start();
         while(opModeIsActive()){
-            telemetry.addData("X: ", gps.getX());
-            telemetry.addData("Y: ", gps.getY());
+            drive.teleopTank(gamepad1,0.5);
+            telemetry.addData("X: ", gps.getXCoordinate());
+            telemetry.addData("Y: ", gps.getYCoordinate());
             telemetry.addData("Angle (Degrees): ", gps.getOrientationDegrees());
             telemetry.addData("Angle (Radians): ", gps.getOrientationRadians());
             telemetry.update();
