@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.utils.CONFIG;
 import org.firstinspires.ftc.teamcode.utils.Encoders;
+import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 
 import java.io.File;
 
@@ -13,6 +14,7 @@ import java.io.File;
  * Created by Sarthak on 6/1/2019.
  */
 public class GlobalPosition implements Runnable{
+    MecanumDrive drive;
     //Odometry wheels
     Encoders encoder;
 
@@ -47,7 +49,7 @@ public class GlobalPosition implements Runnable{
     public GlobalPosition(HardwareMap hmap, int threadSleepDelay){
         this.encoder = new Encoders(hmap);
         this.sleepTime = threadSleepDelay;
-
+        drive = new MecanumDrive(hmap,false);
         encoderWheelDistance = Double.parseDouble(ReadWriteFile.readFile(wheelBaseSeparationFile).trim()) * this.COUNTS_PER_INCH;
         this.horizontalOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());
     }
@@ -105,9 +107,31 @@ public class GlobalPosition implements Runnable{
     public void reverseHorizontal() {
         normalEncoderPositionMultiplier = -normalEncoderPositionMultiplier;
     }
-    public void goTo(double x, double y, double angle){
-        int a=1;
-        //add stuff here later
+    public void goToPosition(double targetX, double targetY, double power, double desiredOrientation, double marginOfError){
+        //DesiredOrientation is the angle you want the robot to be at while going to (targetX,targetY).
+        //For example if you were strafing, the robot tends to turn a bit, this would make sure you are going straight
+        double distanceToX = targetX - getXCoordinate();
+        double distanceToY = targetY - getYCoordinate();
+        double distance = Math.hypot(distanceToX,distanceToY);
+        while(distance>marginOfError) {
+            distance = Math.hypot(distanceToX,distanceToY);
+            distanceToX = targetX - getXCoordinate();
+            distanceToY = targetY - getYCoordinate();
+            double travelAngle = Math.toDegrees(Math.atan2(distanceToX, distanceToY)); //For example if i am at 2,2 and want to go to 10,10. I would want to travel at a 45 degree angle
+            //0 degrees is up rather than right in a unit circle
+            double xComp = calculateXComponent(travelAngle, power);
+            double yComp = calculateYComponent(travelAngle, power);
+
+            double pivotCorrection = desiredOrientation - getOrientationDegrees(); //Pivots so that it maintains the desiredOrientation while travelling to position
+            drive.XYCorrection(xComp,yComp,pivotCorrection);
+        }
+
+    }
+    public double calculateXComponent(double angle, double power){
+        return Math.sin(Math.toRadians(angle))*power; //This is sin because you want 0 degrees to go up rather than east
+    }
+    public double calculateYComponent(double angle, double power){
+        return Math.cos(Math.toRadians(angle))*power; //This is cos because you want 0 degrees to go up rather than east
     }
     @Override
     public void run() {

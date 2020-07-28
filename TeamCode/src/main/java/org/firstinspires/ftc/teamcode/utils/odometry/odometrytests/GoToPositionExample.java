@@ -72,11 +72,9 @@ public class GoToPositionExample extends LinearOpMode {
     }
     public double calculateXComponent(double angle, double power){
         return Math.sin(Math.toRadians(angle))*power; //This is sin because you want 0 degrees to go up rather than east
-
     }
     public double calculateYComponent(double angle, double power){
         return Math.cos(Math.toRadians(angle))*power; //This is cos because you want 0 degrees to go up rather than east
-
     }
 
 }

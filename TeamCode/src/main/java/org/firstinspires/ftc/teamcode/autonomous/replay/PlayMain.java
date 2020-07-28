@@ -39,7 +39,7 @@ public class PlayMain extends LinearOpMode {
                 }
                 timeDiff = timeStamp-(System.currentTimeMillis()-start);
                 if(timeDiff<=0){
-                    gps.goTo(input.nextDouble(),input.nextDouble(),input.nextDouble());
+                    gps.goToPosition(input.nextDouble(),input.nextDouble(),0.5,input.nextDouble(),1);
                     onTime=true;
                 }
                 else{
