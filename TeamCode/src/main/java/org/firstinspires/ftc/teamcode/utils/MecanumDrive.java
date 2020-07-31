@@ -18,6 +18,12 @@ public class MecanumDrive {
     private String brName = CONFIG.BACKRIGHT;
     GlobalPosition gps;
     private DcMotor fl, fr,bl,br;
+
+    /**
+     * Function to initialize Mecanum Drive
+     * @param hardwareMap Initializes the motors based on the name from the config file
+     * @param usingEncoder If true, the wheels will be set to run using encoder and vice versa
+     */
     public MecanumDrive(HardwareMap hardwareMap, boolean usingEncoder){
         gps = new GlobalPosition(hardwareMap,75);
         GlobalPosition gps = new GlobalPosition(hardwareMap,75);
