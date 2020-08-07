@@ -10,9 +10,7 @@ import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 
 import java.io.File;
 
-/**
- * Created by Sarthak on 6/1/2019.
- */
+
 public class GlobalPosition implements Runnable{
     MecanumDrive drive;
     //Odometry wheels
@@ -53,7 +51,15 @@ public class GlobalPosition implements Runnable{
         encoderWheelDistance = Double.parseDouble(ReadWriteFile.readFile(wheelBaseSeparationFile).trim()) * this.COUNTS_PER_INCH;
         this.horizontalOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());
     }
-
+    public setX(double x){
+        globalX = x;
+    }
+    public setY(double y){
+        globalY = y;
+    }
+    public setHeading(double theta){
+        globalRadians(theta);
+    }
     public void globalCoordinatePositionUpdate() {
         //Get Current Positions
         leftEncoderPos = (encoder.getLeft()* verticalLeftEncoderPositionMultiplier);
