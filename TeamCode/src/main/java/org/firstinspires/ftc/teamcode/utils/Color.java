@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.utils;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
 import android.graphics.Color;
 
 public class Color{
@@ -23,9 +26,9 @@ public class Color{
 		float floatHsvValues[] = {0F, 0F, 0F};
 		double hsvValues[] ={0.0, 0.0, 0.0};
 		Color.RGBToHSV((int) (this.colorSensor.red() * this.SCALE_FACTOR),
-						(int) (this.colorSensor.green() * this.SCALE_FACTOR),
-						(int) (this.colorSensor.blue() * this.SCALE_FACTOR),
-						floatHsvValues);
+				(int) (this.colorSensor.green() * this.SCALE_FACTOR),
+				(int) (this.colorSensor.blue() * this.SCALE_FACTOR),
+				floatHsvValues);
 		hsvValues = floatHsvValues;
 		return hsvValues;
 	}
