@@ -150,6 +150,15 @@ public class MecanumDrive {
         }
 
     }
+    public void fieldCentricDrive(Gamepad gamepad1, double angle){
+        double forward = gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
+        angle = Math.toRadians(angle);
+        double newForward = forward*Math.cos(angle) + strafe*Math.sin(angle);
+        double newStrafe = -forward*Math.sin(angle)+strafe*Math.cos(angle);
+        XYCorrection(newForward,newStrafe,turn);
+    }
     public void stop(){
         setPower(0.0,0.0,0.0,0.0);
     }
