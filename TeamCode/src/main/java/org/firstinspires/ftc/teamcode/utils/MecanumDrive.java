@@ -56,17 +56,37 @@ public class MecanumDrive {
             this.br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
+
     public void setRunMode(DcMotor.RunMode runMode){
         this.fl.setMode(runMode);
         this.fr.setMode(runMode);
         this.bl.setMode(runMode);
         this.br.setMode(runMode);
     }
+
     public void setPower(double fl, double fr, double bl, double br){
         this.fl.setPower(fl);
         this.fr.setPower(fr);
         this.bl.setPower(bl);
         this.br.setPower(br);
+    }
+    public void forwardWithPower(double power){
+        if(Math.abs(power)>1){
+            power = power>0 ? 1 : -1;
+        }
+        setPower(power,power,power,power);
+    }
+    public void backwardWithPower(double power){
+        forwardWithPower(-power);
+    }
+    public void strafeLeftWithPower(double power){
+        if(Math.abs(power)>1){
+            power = power>0 ? 1 : -1;
+        }
+        setPower(-power,power,power,-power);
+    }
+    public void strafeRightWithPower(double power){
+        strafeLeftWithPower(-power);
     }
     public double[] calculateSpeedsJoysticks(double leftX,double leftY, double rightX){
         double wheelPower, stickAngleRadians, rightx, flPower, frPower, blPower,brPower, sinAngle,cosAngle,factor;
@@ -155,9 +175,9 @@ public class MecanumDrive {
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
         angle = Math.toRadians(angle);
-        double newForward = forward*Math.cos(angle) + strafe*Math.sin(angle);
-        double newStrafe = -forward*Math.sin(angle)+strafe*Math.cos(angle);
-        XYCorrection(newForward,newStrafe,turn);
+        double x = forward*Math.cos(angle) + strafe*Math.sin(angle);
+        double y = -forward*Math.sin(angle)+strafe*Math.cos(angle);
+        XYCorrection(x,y,turn);
     }
     public void stop(){
         setPower(0.0,0.0,0.0,0.0);
