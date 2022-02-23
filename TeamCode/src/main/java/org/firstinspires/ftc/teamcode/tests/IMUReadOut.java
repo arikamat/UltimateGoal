@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tests;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,5 +17,4 @@ public class IMUReadOut extends OpMode {
         telemetry.addData("Angle",imu.getZAngle());
         telemetry.update();
     }
-
 }

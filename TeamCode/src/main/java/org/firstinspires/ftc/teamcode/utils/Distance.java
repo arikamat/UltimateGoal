@@ -7,8 +7,8 @@ public class Distance{
 
 	DistanceSensor distanceSensor;
 
-	public Color (HardwareMap hmap, String name){
-		this.distanceSensor = hardwareMap.get(DistanceSensor.class, name);
+	public Distance (HardwareMap hmap, String name){
+		this.distanceSensor = hmap.get(DistanceSensor.class, name);
 	}
 
 	public double getDistance(){
